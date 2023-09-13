@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { nanoid } from 'nanoid';
 import cl from './contactForm.module.css';
 import Plus from 'components/ui/icons/Plus';
 import clsx from 'clsx';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { useDispatch, useSelector } from 'react-redux';
-import { getContacts } from 'redux/selectors';
-import { addContact } from 'redux/contactsSlice';
+import {
+  getCheckedContactName,
+  getCheckedContactNumber,
+} from 'redux/selectors';
+import { addContact } from 'redux/operations';
 
 Notify.init({
   useIcon: false,
@@ -16,12 +18,6 @@ Notify.init({
   className: cl.message,
   warning: {
     background: '#ff0066',
-    textColor: '#fff',
-    childClassName: 'notiflix-notify-warning',
-    notiflixIconColor: 'rgba(0,0,0,0.2)',
-    fontAwesomeClassName: 'fas fa-exclamation-circle',
-    fontAwesomeIconColor: 'rgba(0,0,0,0.2)',
-    backOverlayColor: 'rgba(238,191,49,0.2)',
   },
 });
 
@@ -29,43 +25,14 @@ export default function ContactForm() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
-  const contacts = useSelector(getContacts);
   const dispatch = useDispatch();
+
+  const nameClone = useSelector(getCheckedContactName(name));
+  const numberClone = useSelector(getCheckedContactNumber(number));
 
   const reset = () => {
     setName('');
     setNumber('');
-  };
-
-  const checkContactName = () => {
-    return contacts.find(contact => {
-      return (
-        contact.name.trim().toLowerCase() ===
-        name
-          .trim()
-          .split(' ')
-          .filter(word => word !== '')
-          .join(' ')
-          .toLowerCase()
-      );
-    });
-  };
-
-  const checkContactNumber = () => {
-    return contacts.find(contact => {
-      return (
-        contact.number
-          .trim()
-          .split(' ')
-          .filter(num => num !== '')
-          .join('') ===
-        number
-          .trim()
-          .split(' ')
-          .filter(num => num !== '')
-          .join('')
-      );
-    });
   };
 
   const checkDuplicates = (nameClone, numberClone) => {
@@ -93,15 +60,11 @@ export default function ContactForm() {
   const handleSubmit = e => {
     e.preventDefault();
 
-    const nameClone = checkContactName();
-    const numberClone = checkContactNumber();
-
     if (!checkDuplicates(nameClone, numberClone)) {
       return;
     }
 
     const newContact = {
-      id: nanoid(),
       name: name
         .trim()
         .split(' ')

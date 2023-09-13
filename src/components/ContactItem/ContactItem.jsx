@@ -3,9 +3,10 @@ import cl from './contactitem.module.css';
 import Trash from 'components/ui/icons/Trash';
 import clsx from 'clsx';
 import { useDispatch } from 'react-redux';
-import { removeContact } from 'redux/contactsSlice';
+import { deleteContact } from 'redux/operations';
+// import { removeContact } from 'redux/contactsSlice';
 
-const ContactItem = ({ name, number, url }) => {
+const ContactItem = ({ id, name, number, url }) => {
   const dispatch = useDispatch();
 
   return (
@@ -27,7 +28,7 @@ const ContactItem = ({ name, number, url }) => {
         <button
           className={cl.button}
           onClick={() => {
-            dispatch(removeContact(name));
+            dispatch(deleteContact(id));
           }}
         >
           <Trash />
